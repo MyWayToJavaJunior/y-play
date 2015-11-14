@@ -4,24 +4,24 @@ import com.ning.http.client.*;
 import yplay.core.data.VideoSearchResult;
 import yplay.core.fetcher.request.RequestHandler;
 import yplay.gui.attractor.SearchVideoAttractor;
+import yplay.gui.attractor.VideoListAttractor;
 
-public final class VideoListFetcher extends AbstractFetcher {
-    private static final String URL = "http://i2dev.ru:8112/youtube-helper/search/video?query=";
-    private SearchVideoAttractor attractor;
+public abstract class VideoListFetcher extends AbstractFetcher {
+    private VideoListAttractor attractor;
     private VideoSearchResult lastGotResult;
     private boolean nextPageInAction = false;
     String currentPageId = "";
 
-    public VideoListFetcher(SearchVideoAttractor attractor) {
+    public VideoListFetcher(VideoListAttractor attractor) {
         this.attractor = attractor;
     }
 
-    public void find(String term) {
-        http.prepareGet(constructSearchURL(term)).execute(new RequestHandler() {
+    public void fetch(String term) {
+        http.prepareGet(constructFetchURL(term)).execute(new RequestHandler() {
             @Override
             public Response onCompleted(Response response) throws Exception {
                 lastGotResult = VideoSearchResult.createFromJsonText(getResponseText());
-                attractor.onFound(lastGotResult);
+                attractor.onGot(lastGotResult);
                 return response;
             }
         });
@@ -35,7 +35,7 @@ public final class VideoListFetcher extends AbstractFetcher {
         getPage(lastGotResult.getTerm(), lastGotResult.getNextPageToken());
     }
 
-    private void getPage(String term, String page) {
+    protected void getPage(String term, String page) {
         if (page.equals(currentPageId)) {
             return;
         }
@@ -55,11 +55,9 @@ public final class VideoListFetcher extends AbstractFetcher {
         });
     }
 
-    private static String constructSearchURL(String term) {
-        return URL + term;
-    }
+    protected abstract String constructFetchURL(String term);
 
-    private static String constructNextPageURL(String term, String pageId) {
-        return constructSearchURL(term) + "&page=" + pageId;
+    protected String constructNextPageURL(String term, String pageId) {
+        return constructFetchURL(term) + "&page=" + pageId;
     }
 }

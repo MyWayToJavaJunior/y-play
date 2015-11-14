@@ -14,11 +14,13 @@ import yplay.core.data.ActiveVideoItem;
 import yplay.core.data.VideoListItem;
 import yplay.core.data.VideoStream;
 import yplay.core.fetcher.ActiveVideoFetcher;
-import yplay.core.fetcher.VideoListFetcher;
+import yplay.core.fetcher.ChannelContentFetcher;
+import yplay.core.fetcher.SearchVideoFetcher;
 import yplay.core.player.ExternalVideoPlayer;
 import yplay.gui.attractor.ActiveVideoAttractor;
 import yplay.gui.attractor.SearchVideoAttractor;
 import yplay.gui.GuiUtils;
+import yplay.gui.attractor.VideoListAttractor;
 
 public class MainController {
 
@@ -33,16 +35,14 @@ public class MainController {
     @FXML private TextField searchString;
     @FXML private Button searchButton;
     @FXML private ListView searchResults;
+    @FXML private ListView channelContent;
     @FXML private Accordion videoListAccordion;
     @FXML private TitledPane searchVideoResultContainer;
     @FXML private VBox activeImageMainContainer;
 
-    // Attractors
-    private SearchVideoAttractor searchVideoAttractor;
-    private ActiveVideoAttractor activeVideoAttractor;
-
     // Fetchers
-    private VideoListFetcher searchVideoFetcher;
+    private ChannelContentFetcher channelContentFetcher;
+    private SearchVideoFetcher searchVideoFetcher;
     private ActiveVideoFetcher activeVideoFetcher;
 
     @FXML
@@ -65,22 +65,33 @@ public class MainController {
     private void initActions() {
         searchButton.setOnAction(event -> search());
         searchString.setOnAction(event -> search());
+
         searchResults.setOnScroll(this::onSearchListScroll);
         searchResults.setOnKeyTyped(this::onVideoListKeyTyped);
-        searchResults.setOnKeyPressed(this::onVideoListKeyPressed);
+        searchResults.setOnKeyPressed(this::onSearchResultKeyPressed);
         searchResults.setOnMouseClicked(this::onVideoListMouseClicked);
+
         activeVideoThumbnail.setOnMouseClicked(this::onPlayClicked);
         activeVideoRelated.setOnKeyTyped(this::onVideoListKeyTyped);
         activeVideoRelated.setOnMouseClicked(this::onVideoListMouseClicked);
+
         videoTrack.setOnKeyTyped(this::onStreamListKeyTyped);
+
+        channelContent.setOnScroll(this::onChannelContentScroll);
+        channelContent.setOnKeyTyped(this::onVideoListKeyTyped);
+        channelContent.setOnKeyPressed(this::onChannelContentKeyPressed);
+        channelContent.setOnMouseClicked(this::onVideoListMouseClicked);
     }
 
     private void initAttractors() {
-        searchVideoAttractor = new SearchVideoAttractor(searchResults, searchVideoResultContainer, videoListAccordion);
-        searchVideoFetcher = new VideoListFetcher(searchVideoAttractor);
+        SearchVideoAttractor searchVideoAttractor = new SearchVideoAttractor(searchResults, searchVideoResultContainer, videoListAccordion);
+        searchVideoFetcher = new SearchVideoFetcher(searchVideoAttractor);
 
-        activeVideoAttractor = new ActiveVideoAttractor(this);
+        ActiveVideoAttractor activeVideoAttractor = new ActiveVideoAttractor(this);
         activeVideoFetcher = new ActiveVideoFetcher(activeVideoAttractor);
+
+        VideoListAttractor channelContentAttractor = new VideoListAttractor(channelContent);
+        channelContentFetcher = new ChannelContentFetcher(channelContentAttractor);
     }
 
     private void enableActiveVideo() {
@@ -89,10 +100,17 @@ public class MainController {
         activeImageMainContainer.setPrefSize(500, 10);
     }
 
-    private void onVideoListKeyPressed(KeyEvent event) {
+    private void onSearchResultKeyPressed(KeyEvent event) {
         if (event.getCode().getName().toUpperCase().equals("DOWN")
                 && GuiUtils.isLastElementSelected((ListView)event.getSource())) {
             getNextFoundPage();
+        }
+    }
+
+    private void onChannelContentKeyPressed(KeyEvent event) {
+        if (event.getCode().getName().toUpperCase().equals("DOWN")
+                && GuiUtils.isLastElementSelected((ListView)event.getSource())) {
+            channelContentFetcher.getNextPage();
         }
     }
 
@@ -113,6 +131,12 @@ public class MainController {
     private void onSearchListScroll(ScrollEvent event) {
         if (event.getTotalDeltaY() < 0 && GuiUtils.isLastElementVisible((ListView) event.getSource())) {
             getNextFoundPage();
+        }
+    }
+
+    private void onChannelContentScroll(ScrollEvent event) {
+        if (event.getTotalDeltaY() < 0 && GuiUtils.isLastElementVisible((ListView) event.getSource())) {
+            channelContentFetcher.getNextPage();
         }
     }
 
@@ -151,12 +175,17 @@ public class MainController {
         enableActiveVideo();
         videoTrack.requestFocus();
         GlobalConfig.getInstance().putValue("video", "active", item.getId());
+        getChannelContent(item.getChannelId());
     }
 
     private void search() {
         String query = searchString.getText();
         GlobalConfig.getInstance().putValue("search", "query", query);
-        searchVideoFetcher.find(query);
+        searchVideoFetcher.fetch(query);
+    }
+
+    private void getChannelContent(String channelId) {
+        channelContentFetcher.fetch(channelId);
     }
 
     private void getNextFoundPage() {
