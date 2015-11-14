@@ -1,0 +1,50 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "YPlayApp"
+//noinspection GroovyUnusedAssignment
+sourceCompatibility = 1.8
+//noinspection GroovyUnusedAssignment
+targetCompatibility = 1.8
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+
+        //noinspection GroovyAssignabilityCheck
+        resources {
+            srcDirs = ['res']
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+dependencies {
+    compile 'com.ning:async-http-client:1.9.31'
+    compile 'org.json:json:20150729'
+    compile 'ca.szc.configparser:java-configparser:0.1'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
+
+task fatJar(type: Jar) {
+    baseName = project.name + '-all'
+    manifest {
+        //noinspection GroovyAssignabilityCheck
+        attributes 'Main-Class': mainClassName
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}

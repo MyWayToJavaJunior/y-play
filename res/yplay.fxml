@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.web.*?>
+<?import java.lang.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="579.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="yplay.gui.controller.MainController">
+   <top>
+      <HBox prefHeight="24.0" prefWidth="800.0" style="-fx-background-color: #000000; -fx-padding: 5; -fx-spacing: 5;" BorderPane.alignment="CENTER">
+         <children>
+            <TextField id="search-string" fx:id="searchString" prefWidth="10000.0" />
+            <Button id="search-button" fx:id="searchButton" minWidth="100.0" mnemonicParsing="false" text="Search" />
+         </children>
+         <opaqueInsets>
+            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+         </opaqueInsets>
+      </HBox>
+   </top>
+   <right>
+      <VBox fx:id="activeImageMainContainer" minWidth="0.0" prefHeight="200.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+         <children>
+            <BorderPane fx:id="activeVideo" minHeight="220.0" prefHeight="250.0" prefWidth="200.0">
+               <right>
+                  <ListView fx:id="videoTrack" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets top="5.0" />
+                     </BorderPane.margin></ListView>
+               </right>
+               <center>
+                  <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <ImageView id="active-video-thumbnail" fx:id="activeVideoThumbnail" fitHeight="90.0" fitWidth="120.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></ImageView>
+                        <Label fx:id="activeVideoTitle" alignment="TOP_LEFT" contentDisplay="TEXT_ONLY" layoutX="125.0" layoutY="3.0" maxWidth="265.0" text="Active video title" textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="11.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="videoLength" layoutX="125.0" layoutY="50.0" maxWidth="265.0" mouseTransparent="true" text="length">
+                           <font>
+                              <Font size="11.0" />
+                           </font></Label>
+                        <Label fx:id="videoAuthor" layoutX="125.0" layoutY="66.0" maxWidth="265.0" mouseTransparent="true" text="author">
+                           <font>
+                              <Font size="11.0" />
+                           </font></Label>
+                        <Label fx:id="videoPublished" layoutX="125.0" layoutY="82.0" maxWidth="265.0" mouseTransparent="true" text="published">
+                           <font>
+                              <Font size="11.0" />
+                           </font></Label>
+                        <TextArea id="active-video-description" fx:id="videoDescription" layoutY="100.0" prefHeight="120.0" prefWidth="390.0" wrapText="true">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </TextArea>
+                     </children>
+                  </Pane>
+               </center>
+               <VBox.margin>
+                  <Insets right="5.0" />
+               </VBox.margin>
+            </BorderPane>
+            <ListView fx:id="activeVideoRelated" prefHeight="10000.0" prefWidth="200.0">
+               <VBox.margin>
+                  <Insets bottom="5.0" right="5.0" top="5.0" />
+               </VBox.margin></ListView>
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+      </VBox>
+   </right>
+   <center>
+      <Accordion fx:id="videoListAccordion" BorderPane.alignment="CENTER">
+        <panes>
+          <TitledPane fx:id="searchVideoResultContainer" animated="false" minWidth="500.0" text="Search results">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ListView fx:id="searchResults" prefHeight="200.0" prefWidth="300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                  </AnchorPane>
+            </content>
+          </TitledPane>
+          <TitledPane animated="false" text="Channel">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ListView prefHeight="200.0" prefWidth="300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                     <padding>
+                        <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                     </padding>
+                  </AnchorPane>
+            </content>
+          </TitledPane>
+        </panes>
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+      </Accordion>
+   </center>
+</BorderPane>

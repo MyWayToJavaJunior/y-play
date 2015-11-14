@@ -1,0 +1,38 @@
+#search-button {
+    -fx-background-insets: 0,1,1;
+    -fx-background-radius: 1,1,1;
+    -fx-padding: 5 15 5 15;
+    -fx-text-fill: black;
+}
+
+#search-string {
+    -fx-background-insets: 0,1,1;
+    -fx-background-radius: 1,1,1;
+    -fx-padding: 5 15 5 15;
+    -fx-text-fill: black;
+}
+
+#active-video-description {
+    -fx-background-radius: 0,0,0;
+}
+
+#active-video-thumbnail {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,1), 5, 0, 0, 0);
+}
+
+#active-video-description *.scroll-bar:vertical *.increment-button,
+#active-video-description *.scroll-bar:vertical *.decrement-button {
+    -fx-background-color: null;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+#active-video-description *.scroll-bar:vertical *.increment-arrow,
+#active-video-description *.scroll-bar:vertical *.decrement-arrow {
+    -fx-background-color: null;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-shape: null;
+}
