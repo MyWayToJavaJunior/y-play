@@ -34,14 +34,14 @@ public abstract class VideoListFetcher {
         if (nextPageInAction) {
             return;
         }
-        nextPageInAction = true;
         getPage(lastGotResult.getTerm(), lastGotResult.getNextPageToken());
     }
 
     protected void getPage(String term, String page) {
-        if (page.equals(currentPageId)) {
+        if (page == null || (currentPageId != null && page.equals(currentPageId))) {
             return;
         }
+        nextPageInAction = true;
         new Thread() {
             public void run() {
                 try {
