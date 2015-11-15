@@ -28,7 +28,6 @@ repositories {
 }
 
 dependencies {
-    compile 'com.ning:async-http-client:1.9.31'
     compile 'org.json:json:20150729'
     compile 'ca.szc.configparser:java-configparser:0.1'
 }

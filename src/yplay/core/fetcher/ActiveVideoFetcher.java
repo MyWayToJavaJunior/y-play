@@ -1,11 +1,10 @@
 package yplay.core.fetcher;
 
-import com.ning.http.client.Response;
 import yplay.core.data.ActiveVideoItem;
-import yplay.core.fetcher.request.RequestHandler;
+import yplay.core.http.HttpClient;
 import yplay.gui.attractor.ActiveVideoAttractor;
 
-public final class ActiveVideoFetcher extends AbstractFetcher {
+public final class ActiveVideoFetcher {
     private static final String URL = "http://i2dev.ru:8112/youtube-helper/video?videoId=";
     private ActiveVideoItem lastGotResult;
     private ActiveVideoAttractor attractor;
@@ -18,15 +17,18 @@ public final class ActiveVideoFetcher extends AbstractFetcher {
         if (lastGotResult != null && lastGotResult.getId().equals(videoId)) {
             return;
         }
-
-        http.prepareGet(constructGetVideoURL(videoId)).execute(new RequestHandler() {
-            @Override
-            public Response onCompleted(Response response) throws Exception {
-                lastGotResult = ActiveVideoItem.createFromJsonText(getResponseText());
-                attractor.onLoaded(lastGotResult);
-                return response;
+        new Thread() {
+            public void run() {
+                try {
+                    lastGotResult = ActiveVideoItem.createFromJsonText(HttpClient.getHTML(constructGetVideoURL(videoId)));
+                    attractor.onLoaded(lastGotResult);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    //Nothing to do
+                }
             }
-        });
+        }.start();
     }
 
     private static String constructGetVideoURL(String videoId) {

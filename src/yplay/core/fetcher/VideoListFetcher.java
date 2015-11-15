@@ -1,12 +1,10 @@
 package yplay.core.fetcher;
 
-import com.ning.http.client.*;
 import yplay.core.data.VideoSearchResult;
-import yplay.core.fetcher.request.RequestHandler;
-import yplay.gui.attractor.SearchVideoAttractor;
+import yplay.core.http.HttpClient;
 import yplay.gui.attractor.VideoListAttractor;
 
-public abstract class VideoListFetcher extends AbstractFetcher {
+public abstract class VideoListFetcher {
     private VideoListAttractor attractor;
     private VideoSearchResult lastGotResult;
     private boolean nextPageInAction = false;
@@ -17,18 +15,23 @@ public abstract class VideoListFetcher extends AbstractFetcher {
     }
 
     public void fetch(String term) {
-        http.prepareGet(constructFetchURL(term)).execute(new RequestHandler() {
-            @Override
-            public Response onCompleted(Response response) throws Exception {
-                lastGotResult = VideoSearchResult.createFromJsonText(getResponseText());
-                attractor.onGot(lastGotResult);
-                return response;
+        new Thread() {
+            public void run() {
+                try {
+                    String req = java.net.URLEncoder.encode(term, "UTF-8");
+                    lastGotResult = VideoSearchResult.createFromJsonText(HttpClient.getHTML(constructFetchURL(req)));
+                    attractor.onGot(lastGotResult);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    //Nothing to do
+                }
             }
-        });
+        }.start();
     }
 
     public void getNextPage() {
-        if (nextPageInAction && !http.isClosed()) {
+        if (nextPageInAction) {
             return;
         }
         nextPageInAction = true;
@@ -39,20 +42,22 @@ public abstract class VideoListFetcher extends AbstractFetcher {
         if (page.equals(currentPageId)) {
             return;
         }
-        http.prepareGet(constructNextPageURL(term, page)).execute(new RequestHandler() {
-            @Override
-            public Response onCompleted(Response response) throws Exception {
-                currentPageId = page;
-                lastGotResult = VideoSearchResult.createFromJsonText(getResponseText());
-                attractor.onPageGot(lastGotResult);
+        new Thread() {
+            public void run() {
+                try {
+                    currentPageId = page;
+                    String eTerm = java.net.URLEncoder.encode(term, "UTF-8");
+                    String ePage = java.net.URLEncoder.encode(page, "UTF-8");
+                    lastGotResult = VideoSearchResult.createFromJsonText(HttpClient.getHTML(constructNextPageURL(eTerm, ePage)));
+                    attractor.onPageGot(lastGotResult);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    nextPageInAction = false;
+                }
                 nextPageInAction = false;
-                return response;
             }
-
-            public void onThrowable(Throwable t) {
-                nextPageInAction = false;
-            }
-        });
+        }.start();
     }
 
     protected abstract String constructFetchURL(String term);
