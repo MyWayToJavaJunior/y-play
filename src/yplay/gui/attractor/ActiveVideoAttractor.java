@@ -13,8 +13,6 @@ public class ActiveVideoAttractor {
     }
 
     public void onLoaded(ActiveVideoItem loadedVideo) {
-        Platform.runLater(() -> {
-            controller.onActiveVideoSelected(loadedVideo);
-        });
+        Platform.runLater(() -> controller.onActiveVideoSelected(loadedVideo));
     }
 }
